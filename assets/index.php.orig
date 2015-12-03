@@ -1,0 +1,104 @@
+<?php
+mysql_connect('mysql.dvanoni.com','dvanoni','pLr.bEAr');
+mysql_select_db('harmonicdistortion');
+
+function printSeason($season) {
+	$query = "SELECT * FROM shows WHERE season='$season'";
+	$result = mysql_query($query);
+
+	echo "<table border=\"0\" cellpadding=\"5\">\n";
+	while($row = mysql_fetch_assoc($result)) {
+		$date = date("M j Y", strtotime($row['date']));
+		echo "\t\t\t\t\t<tr><td>$date</td>";
+		echo "<td><a href=\"/media/$row[url]\">Harmonic Distortion - $date</a></td></tr>\n";
+	}
+	echo "\t\t\t\t</table>\n";
+}
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Harmonic Distortion</title>
+<link href="/styles.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+<script type="text/javascript" src="/audio-player/swfobject.js"></script>
+<script type="text/javascript" src="/audio-player/audio-player.js"></script>
+<script type="text/javascript">
+function embedPlayers() {
+	var count = 1;
+	$("tr a").each(function() {
+		var id = "audioplayer_" + count++;
+		var file = $(this).attr("href");
+		var title = $(this).html();
+		$(this).attr("id", id);
+		AudioPlayer.embed(id, {
+			soundFile: file,
+			titles: title
+		});
+		$(this).after("<br/>&nbsp;&nbsp;<a href='"+file+"'>download</a>");
+	});
+}
+
+$(function() {
+	AudioPlayer.setup("/audio-player/player.swf", {
+		width: 320,
+		transparentpagebg: "yes"});
+	
+<?php if (!isset($_GET['noflash'])) { ?>
+	embedPlayers();
+<?php } ?>
+	
+	$("#title img").hover(function() {
+			$(this).attr("src", "images/title_white.png");
+		},
+		function() {
+			$(this).attr("src", "images/title_gray.png");
+		});
+
+});
+</script>
+</head>
+<body>
+<div id="container">
+	<div id="header">
+		<div id="fade"></div>
+		<div id="origami"></div>
+		<a id="title" href="/"><img src="images/title_gray.png" alt="Harmonic Distortion"/></a>
+	</div>
+	<div id="main">
+		<div>
+			<h1>The DJs</h1>
+			<div id="bios">
+				<img alt="DJ T" src="images/djt.jpg"/>
+				<div>
+					<div id="djt">
+						<h2>DJ T</h2>
+						<p>This man is so Dutch, he was just destined to be a DJ...</p>
+					</div>
+					<div id="djv">
+						<h2>DJ V</h2>
+						<p>If you think that headband is kickin', wait till you hear his music...</p> 
+					</div>
+				</div>
+				<img alt="DJ V" src="images/djv.jpg"/>
+			</div>
+		</div>
+		<div id="shows">
+			<h1>Shows</h1>
+			<div class="season">
+				<h2>Season 1 (Winter 2010)</h2>
+				<?php printSeason(1); ?>
+			</div>
+			<div class="season">
+				<h2>Season 2 (Spring 2010)</h2>
+				<?php printSeason(2); ?>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>
+<?php
+mysql_close();
+?>
